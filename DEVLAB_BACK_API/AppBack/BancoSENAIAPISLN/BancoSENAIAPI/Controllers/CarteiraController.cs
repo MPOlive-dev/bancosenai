@@ -9,9 +9,9 @@ namespace BancoSENAIAPI.Controllers
     {
         private static List<Carteira> _carteiras = new List<Carteira>
         {
-            new Carteira { NumeroCarteira = 1001, NomeCarteira = "Aracaju", ApetiteCarteira = 100 },
-            new Carteira { NumeroCarteira = 2002, NomeCarteira = "São Paulo", ApetiteCarteira = 100 },
-            new Carteira { NumeroCarteira = 3003, NomeCarteira = "Salvador", ApetiteCarteira = 100 }
+            new Carteira { NumeroCarteira = 1001, NomeCarteira = "Investimento Futuro", ApetiteCarteira = 1000000 },
+            new Carteira { NumeroCarteira = 2002, NomeCarteira = "Crescimento Seguro", ApetiteCarteira = 1000000 },
+            new Carteira { NumeroCarteira = 3003, NomeCarteira = "Oportunidades", ApetiteCarteira = 1000000 }
         };
 
         public object carteiraAtualizada { get; private set; }
