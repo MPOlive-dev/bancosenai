@@ -5,8 +5,6 @@ namespace BancoSENAIAPI.Controllers
 {
     [ApiController]
     [Route("api/v1/[controller]")]
-    public class ClienteController : Controller
-    {
         public class ClienteController : ControllerBase
         {
             private static List<Cliente> _clientes = new List<Cliente>
@@ -78,5 +76,4 @@ namespace BancoSENAIAPI.Controllers
                 return Ok(new { message = "Cliente excluída com sucesso." }); // Status 200 [6]
             }
         }
-    }
 }
