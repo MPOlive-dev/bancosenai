@@ -1,12 +1,73 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using BancoSENAIAPI.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace BancoSENAIAPI.Controllers
 {
-    public class HomeController : Controller
+    [ApiController]
+    [Route("api/v1/[controller]")]
+    public class CarteiraController : ControllerBase
     {
-        public IActionResult Index()
+        private static List<Carteira> _carteiras = new List<Carteira>
         {
-            return View();
+            new Carteira { NumeroCarteira = 1001, NomeCarteira = "Aracaju", ApetiteCarteira = 100 },
+            new Carteira { NumeroCarteira = 2002, NomeCarteira = "São Paulo", ApetiteCarteira = 100 },
+            new Carteira { NumeroCarteira = 3003, NomeCarteira = "Salvador", ApetiteCarteira = 100 }
+        };
+
+        public object carteiraAtualizada { get; private set; }
+
+        [HttpGet]
+        public IActionResult ListarTodas()
+        {
+            return Ok(_carteiras);
+        }
+
+        [HttpPost]
+        public IActionResult Cadastrar([FromBody] Carteira novaCarteira)
+        {
+
+            if (_carteiras.Any(a => a.NumeroCarteira == novaCarteira.NumeroCarteira))
+                return BadRequest(new { message = "Este número de carteira já existe." });
+
+            _carteiras.Add(novaCarteira);
+            // Retorna Status 201 Created conforme boas práticas REST [6, 8]
+            return Created("", novaCarteira);
+        }
+
+        [HttpGet("{codigo}")]
+        public IActionResult ConsultarPorCodigo(int codigo)
+        {
+            var carteira = _carteiras.FirstOrDefault(a => a.NumeroCarteira == codigo);
+
+            if (carteira == null)
+                return NotFound(new { message = "Carteira não encontrada." }); // Status 404 [6, 7]
+
+            return Ok(carteira); // Status 200 OK [6, 7]
+        }
+
+        [HttpPut("{codigo}")]
+        public IActionResult Alterar(int codigo, [FromBody] Carteira carteiraAtualizada)
+        {
+            var carteiraExistente = _carteiras.FirstOrDefault(a => a.NumeroCarteira == codigo);
+
+            if (carteiraExistente == null) return NotFound();
+
+            carteiraExistente.NomeCarteira = carteiraAtualizada.NomeCarteira;
+            carteiraExistente.ApetiteCarteira = carteiraAtualizada.ApetiteCarteira;
+
+            // Retorna Status 204 No Content para atualizações bem-sucedidas [6, 9]
+            return NoContent();
+        }
+
+        [HttpDelete("{codigo}")]
+        public IActionResult Excluir(int codigo)
+        {
+            var carteira = _carteiras.FirstOrDefault(a => a.NumeroCarteira == codigo);
+
+            if (carteira == null) return NotFound();
+
+            _carteiras.Remove(carteira);
+            return Ok(new { message = "Carteira excluída com sucesso." }); // Status 200 [6]
         }
     }
 }
