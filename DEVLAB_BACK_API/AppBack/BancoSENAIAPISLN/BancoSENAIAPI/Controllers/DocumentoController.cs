@@ -2,11 +2,9 @@
 
 namespace BancoSENAIAPI.Controllers
 {
+    [ApiController]
     public class DocumentoController : Controller
     {
-        public IActionResult Index()
-        {
-            return View();
-        }
+        
     }
 }
