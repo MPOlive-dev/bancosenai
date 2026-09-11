@@ -21,6 +21,13 @@ namespace BancoSENAIAPI.Controllers
             {
                 return BadRequest("Nenhum arquivo foi gerado.");
             }
+
+            string pastaCliente = Path.Combine(_caminhoRaiz, codigoCliente.ToString());
+
+            if (!Directory.Exists(pastaCliente))
+            {
+                Directory.CreateDirectory(pastaCliente);
+            }
         }
     }
 }
