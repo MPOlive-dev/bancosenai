@@ -95,5 +95,25 @@ namespace BancoSENAIAPI.Controllers
             _documentoMetadados.Remove(documento);
             return Ok(new { mensagem = "Documento e arquivo físico excluídos com sucesso." });
         }
+        [HttpPost("upload")]
+        public async Task<IActionResult> Upload(IFormFile arquivo)
+        {
+            if (arquivo == null || arquivo.Length == 0)
+            {
+                return BadRequest("Nenhum arquivo foi enviado.");
+            }
+            const long limiteTamanho = 2 * 1024 * 1024;
+            if (arquivo.Length > limiteTamanho)
+            {
+                return BadRequest("O arquivo não pode ter mais de 2 MB.");
+            }
+            string[] extensoesPermitidas = { ".pdf", ".jpg", ".png" };
+            string extensoes = Path.GetExtension(arquivo.FileName).ToLower();
+            if (!extensoesPermitidas.Contains(extensoes))
+            {
+                return BadRequest("Extensão de arquivo não permitida. Apenas .pdf, .jpg e .png são aceitos.");
+            }
+            return Ok("Arquivo enviado com sucesso.");
+        }
     }
 }
