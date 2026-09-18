@@ -80,5 +80,40 @@ async function enviarDocumento() {
             alert("Erro ao buscar os documentos.");
 
         }
+        async function baixarDocumento(id) {
+
+            try {
+
+                const response = await fetch(`${URL_API}/download/${id}`);
+
+                if (!response.ok) {
+                    throw new Error("Não foi possível baixar o arquivo.");
+                }
+
+                const blob = await response.blob();
+
+                const url = window.URL.createObjectURL(blob);
+
+                const link = document.createElement("a");
+
+                link.href = url;
+                link.download = `documento_${id}`;
+
+                document.body.appendChild(link);
+
+                link.click();
+
+                link.remove();
+
+                window.URL.revokeObjectURL(url);
+
+            } catch (erro) {
+
+                console.error(erro);
+                alert("Erro ao baixar o documento.");
+
+            }
+
+        }
 
     }
