@@ -2,124 +2,124 @@ const URL_API = 'https://localhost:7081/api/v1/Documento';
 
 async function enviarDocumento() {
 
-    const codigoCliente =
-        document.getElementById("codigoCliente").value;
+const codigoCliente =
+    document.getElementById("codigoCliente").value;
 
-    const inputArquivo =
-        document.getElementById("arquivo");
+const inputArquivo =
+    document.getElementById("arquivo");
 
-    const arquivo =
-        inputArquivo.files[0];
-
-
-    if (!codigoCliente || !arquivo) {
-
-        alert("Informe o código do cliente e selecione um arquivo.");
-
-        return;
-    }
+const arquivo =
+    inputArquivo.files[0];
 
 
-    const dadosArquivo = new FormData();
+if (!codigoCliente || !arquivo) {
 
-    dadosArquivo.append("arquivo", arquivo);
+    alert("Informe o código do cliente e selecione um arquivo.");
 
-
-    try {
-
-        const response = await fetch(
-            `${URL_API}/upload/${codigoCliente}`,
-            {
-                method: "POST",
-                body: dadosArquivo
-            }
-        );
+    return;
+}
 
 
-        if (response.ok) {
+const dadosArquivo = new FormData();
 
-            alert("Documento enviado com sucesso!");
+dadosArquivo.append("arquivo", arquivo);
 
-            document.getElementById("arquivo").value = "";
 
-            // Atualiza a tabela
-            await buscarDocumentos();
+try {
 
-        } else {
+    const response = await fetch(
+        `${URL_API}/upload/${codigoCliente}`,
+        {
+            method: "POST",
+            body: dadosArquivo
+        }
+    );
 
-            let erro = {};
 
-            try {
-                erro = await response.json();
-            } catch {
-                // A API não retornou JSON
-            }
+    if (response.ok) {
 
-            alert(
-                "Erro: " +
-                (erro.message || "Falha ao enviar o documento.")
-            );
+        alert("Documento enviado com sucesso!");
+
+        document.getElementById("arquivo").value = "";
+
+       
+        await buscarDocumentos();
+
+    } else {
+
+        let erro = {};
+
+        try {
+            erro = await response.json();
+        } catch {
+        
         }
 
-
-    } catch (erro) {
-
-        console.error(erro);
-
-        alert("Erro ao conectar com a API.");
-
+        alert(
+            "Erro: " +
+            (erro.message || "Falha ao enviar o documento.")
+        );
     }
+
+
+} catch (erro) {
+
+    console.error(erro);
+
+    alert("Erro ao conectar com a API.");
+
+}
 
 }
 
 async function buscarDocumentos() {
 
-    const codigoCliente =
-        document.getElementById("codigoCliente").value;
+const codigoCliente =
+    document.getElementById("codigoCliente").value;
 
 
-    if (!codigoCliente) {
+if (!codigoCliente) {
 
-        alert("Informe o código do cliente.");
+    alert("Informe o código do cliente.");
 
-        return;
+    return;
+}
+
+
+try {
+
+    const response = await fetch(
+        `${URL_API}/cliente/${codigoCliente}`
+    );
+
+
+    if (!response.ok) {
+
+        throw new Error(
+            "Não foi possível buscar os documentos."
+        );
+
     }
 
 
-    try {
-
-        const response = await fetch(
-            `${URL_API}/cliente/${codigoCliente}`
-        );
+    const documentos =
+        await response.json();
 
 
-        if (!response.ok) {
-
-            throw new Error(
-                "Não foi possível buscar os documentos."
-            );
-
-        }
+    const tabela =
+        document.getElementById("tabelaDocumentos");
 
 
-        const documentos =
-            await response.json();
+    tabela.innerHTML = "";
 
 
-        const tabela =
-            document.getElementById("tabelaDocumentos");
+    documentos.forEach(documento => {
+
+        const linha =
+            document.createElement("tr");
 
 
-        tabela.innerHTML = "";
-
-
-        documentos.forEach(documento => {
-
-            const linha =
-                document.createElement("tr");
-
-
-            linha.innerHTML = `
+        linha.innerHTML = `
 
             <td>${documento.id}</td>
 
@@ -151,127 +151,127 @@ async function buscarDocumentos() {
         `;
 
 
-            tabela.appendChild(linha);
+        tabela.appendChild(linha);
 
-        });
+    });
 
 
-    } catch (erro) {
+} catch (erro) {
 
-        console.error(erro);
+    console.error(erro);
 
-        alert("Erro ao buscar os documentos.");
+    alert("Erro ao buscar os documentos.");
 
-    }
+}
 
 }
 
 async function baixarDocumento(id) {
 
-    try {
+try {
 
-        const response = await fetch(
-            `${URL_API}/download/${id}`
+    const response = await fetch(
+        `${URL_API}/download/${id}`
+    );
+
+
+    if (!response.ok) {
+
+        throw new Error(
+            "Não foi possível baixar o arquivo."
         );
 
-
-        if (!response.ok) {
-
-            throw new Error(
-                "Não foi possível baixar o arquivo."
-            );
-
-        }
-
-
-        const blob =
-            await response.blob();
-
-
-        const url =
-            window.URL.createObjectURL(blob);
-
-
-        const link =
-            document.createElement("a");
-
-
-        link.href = url;
-
-        link.download =
-            `documento_${id}`;
-
-
-        document.body.appendChild(link);
-
-        link.click();
-
-        link.remove();
-
-
-        window.URL.revokeObjectURL(url);
-
-
-    } catch (erro) {
-
-        console.error(erro);
-
-        alert("Erro ao baixar o documento.");
-
     }
+
+
+    const blob =
+        await response.blob();
+
+
+    const url =
+        window.URL.createObjectURL(blob);
+
+
+    const link =
+        document.createElement("a");
+
+
+    link.href = url;
+
+    link.download =
+        `documento_${id}`;
+
+
+    document.body.appendChild(link);
+
+    link.click();
+
+    link.remove();
+
+
+    window.URL.revokeObjectURL(url);
+
+
+} catch (erro) {
+
+    console.error(erro);
+
+    alert("Erro ao baixar o documento.");
+
+}
 
 }
 
 async function excluirDocumento(id) {
 
-    const confirmar =
-        confirm(
-            "Tem certeza que deseja excluir este documento?"
+const confirmar =
+    confirm(
+        "Tem certeza que deseja excluir este documento?"
+    );
+
+
+if (!confirmar) {
+
+    return;
+
+}
+
+
+try {
+
+    const response =
+        await fetch(
+            `${URL_API}/${id}`,
+            {
+                method: "DELETE"
+            }
         );
 
 
-    if (!confirmar) {
+    if (!response.ok) {
 
-        return;
+        throw new Error(
+            "Não foi possível excluir o documento."
+        );
 
     }
 
 
-    try {
-
-        const response =
-            await fetch(
-                `${URL_API}/${id}`,
-                {
-                    method: "DELETE"
-                }
-            );
+    alert(
+        "Documento excluído com sucesso!"
+    );
 
 
-        if (!response.ok) {
 
-            throw new Error(
-                "Não foi possível excluir o documento."
-            );
-
-        }
+    await buscarDocumentos();
 
 
-        alert(
-            "Documento excluído com sucesso!"
-        );
+} catch (erro) {
 
+    console.error(erro);
 
-        // Atualiza a tabela
-        await buscarDocumentos();
+    alert("Erro ao excluir o documento.");
 
-
-    } catch (erro) {
-
-        console.error(erro);
-
-        alert("Erro ao excluir o documento.");
-
-    }
+}
 
 }
