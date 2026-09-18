@@ -148,5 +148,73 @@ async function enviarDocumento() {
             }
 
         }
+        async function enviarDocumento() {
+
+            const codigoCliente =
+                document.getElementById("codigoCliente").value;
+
+            const inputArquivo =
+                document.getElementById("arquivo");
+
+            const arquivo = inputArquivo.files[0];
+
+            if (!codigoCliente || !arquivo) {
+
+                alert(
+                    "Informe o código do cliente e selecione um arquivo."
+                );
+
+                return;
+            }
+
+            const dadosArquivo = new FormData();
+
+            dadosArquivo.append("arquivo", arquivo);
+
+            try {
+
+                const response = await fetch(
+                    `${URL_API}/upload/${codigoCliente}`,
+                    {
+                        method: "POST",
+                        body: dadosArquivo
+                    }
+                );
+
+                if (!response.ok) {
+
+                    let erro;
+
+                    try {
+                        erro = await response.json();
+                    } catch {
+                        erro = {};
+                    }
+
+                    alert(
+                        "Erro: " +
+                        (erro.message || "Falha ao enviar o documento.")
+                    );
+
+                    return;
+                }
+
+                alert("Documento enviado com sucesso!");
+
+                // Atualiza a tabela automaticamente
+                await buscarDocumentos();
+
+                // Limpa o formulário
+                document.getElementById("arquivo").value = "";
+
+            } catch (erro) {
+
+                console.error(erro);
+
+                alert("Erro ao enviar o documento.");
+
+            }
+
+        }
 
     }
