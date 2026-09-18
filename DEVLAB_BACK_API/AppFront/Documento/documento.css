@@ -12,8 +12,57 @@ h1 {
     padding: 15px;
     border-radius: 5px;
 }
-input {
+input, button{
     padding: 8px;
     margin-right: 10px;
     border: 1px solid #ccc;
+}
+button {
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#btEnviar {
+    background-color: #198754;
+    color: white;
+}
+
+#btBuscar {
+    background-color: #0d6efd;
+    color: white;
+}
+
+.table-container {
+    display: flex;
+    justify-content: center;
+}
+
+table {
+    width: 80%;
+    border-collapse: collapse;
+    background-color: white;
+}
+
+th,
+td {
+    border: 1px solid #ccc;
+    padding: 12px;
+    text-align: center;
+}
+
+th {
+    background-color: #333;
+    color: white;
+}
+
+.btn-baixar {
+    background-color: #ffc107;
+    color: black;
+    margin-right: 5px;
+}
+
+.btn-excluir {
+    background-color: #dc3545;
+    color: white;
 }
