@@ -1,5 +1,7 @@
 ﻿using BancoSENAIAPI.Models;
 using Microsoft.AspNetCore.Mvc;
+using BancoSENAIAPI.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace BancoSENAIAPI.Controllers
 {
@@ -7,37 +9,37 @@ namespace BancoSENAIAPI.Controllers
     [Route("api/v1/[controller]")]
         public class ClienteController : ControllerBase
         {
-            private static List<Cliente> _clientes = new List<Cliente>
-        {
-            new Cliente { CodigoCliente = 1001, NomeCliente = "Sérgio", CPF = 1000000, NumeroAgencia = 74, SaldoTotal = 1000, Sexo = "Masculino", Endereço = "Pão", Cidade = "Aracaju", Estado = "SE" },
-            new Cliente { CodigoCliente = 2002, NomeCliente = "Melissa", CPF = 1000000,  NumeroAgencia = 74, SaldoTotal = 1000, Sexo = "Feminino", Endereço = "Pão", Cidade = "Aracaju", Estado = "SE"},
-            new Cliente { CodigoCliente = 3003, NomeCliente = "Amanda", CPF = 1000000,  NumeroAgencia = 74, SaldoTotal = 1000, Sexo = "feminino", Endereço = "Pão", Cidade = "Aracaju", Estado = "SE" }
-        };
+           private readonly AppDbContext _context;
 
-            public object clienteAtualizado { get; private set; }
+            public ClienteController(AppDbContext context)
+            {
+                _context = context;
+            }
 
             [HttpGet]
-            public IActionResult ListarTodas()
+            public async Task<IActionResult> ListarTodas()
             {
-                return Ok(_clientes);
+                var clientes = await _context.Cliente.ToListAsync();
+                return Ok(clientes);
             }
 
             [HttpPost]
-            public IActionResult Cadastrar([FromBody] Cliente novoCliente)
+            public async Task<IActionResult> Cadastrar([FromBody] Cliente novoCliente)
             {
 
-                if (_clientes.Any(a => a.CodigoCliente == novoCliente.CodigoCliente))
+                if (await _context.Cliente.AnyAsync(a => a.CodigoCliente == novoCliente.CodigoCliente))
                     return BadRequest(new { message = "Este código já existe." });
 
-                _clientes.Add(novoCliente);
+                _context.Cliente.Add(novoCliente);
+                await _context.SaveChangesAsync();
                 // Retorna Status 201 Created conforme boas práticas REST [6, 8]
                 return Created("", novoCliente);
             }
 
             [HttpGet("{codigo}")]
-            public IActionResult ConsultarPorCodigo(int codigo)
+            public async Task<IActionResult> ConsultarPorCodigo(int codigo)
             {
-                var cliente = _clientes.FirstOrDefault(a => a.CodigoCliente == codigo);
+                var cliente = await _context.Cliente.FirstOrDefaultAsync(a => a.CodigoCliente == codigo);
 
                 if (cliente == null)
                     return NotFound(new { message = "Cliente não encontrado." }); // Status 404 [6, 7]
@@ -46,9 +48,9 @@ namespace BancoSENAIAPI.Controllers
             }
 
             [HttpPut("{codigo}")]
-            public IActionResult Alterar(int codigo, [FromBody] Cliente clienteAtualizado)
+            public async Task<IActionResult> Alterar(int codigo, [FromBody] Cliente clienteAtualizado)
             {
-                var clienteExistente = _clientes.FirstOrDefault(a => a.CodigoCliente == codigo);
+            var clienteExistente = await _context.Cliente.FirstOrDefaultAsync(a => a.CodigoCliente == codigo);
 
                 if (clienteExistente == null) return NotFound();
 
@@ -61,18 +63,21 @@ namespace BancoSENAIAPI.Controllers
                 clienteExistente.Cidade = clienteAtualizado.Cidade;
                 clienteExistente.Estado = clienteAtualizado.Estado;
 
+                await _context.SaveChangesAsync();
+
                 // Retorna Status 204 No Content para atualizações bem-sucedidas [6, 9]
                 return NoContent();
             }
 
             [HttpDelete("{codigo}")]
-            public IActionResult Excluir(int codigo)
+            public async Task<IActionResult> Excluir(int codigo)
             {
-                var cliente = _clientes.FirstOrDefault(a => a.CodigoCliente == codigo);
+                var cliente = await _context.Cliente.FirstOrDefaultAsync(a => a.CodigoCliente == codigo);  
 
                 if (cliente == null) return NotFound();
 
-                _clientes.Remove(cliente);
+                _context.Cliente.Remove(cliente);
+                await _context.SaveChangesAsync();
                 return Ok(new { message = "Cliente excluída com sucesso." }); // Status 200 [6]
             }
         }
