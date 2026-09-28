@@ -42,7 +42,7 @@ namespace BancoSENAIAPI.Controllers
             var documentoMetadados = new Models.DocumentoMetadado
             {
                 Id = _nextId++,
-                Name = nomeOriginal,
+                Nome = nomeOriginal,
                 Extensao = extensao,
                 Caminho = caminhoFinal,
                 CodigoCliente = codigoCliente,
@@ -77,7 +77,7 @@ namespace BancoSENAIAPI.Controllers
                 return NotFound("Arquivo físico não encontrado no servidor.");
             }
             byte[] fileBytes = System.IO.File.ReadAllBytes(documento.Caminho);
-            string nomeParaDownload = $"{documento.Name}{documento.Extensao}";
+            string nomeParaDownload = $"{documento.Nome}{documento.Extensao}";
             return File(fileBytes, "application/octet-stream", nomeParaDownload);
         }
         [HttpDelete("excluir/{id}")]
